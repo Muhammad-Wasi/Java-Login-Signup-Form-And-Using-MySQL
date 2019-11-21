@@ -132,8 +132,8 @@ public class Login extends javax.swing.JFrame {
                 ResultSet res = pst.executeQuery();
                 if(res.next()){
                     JOptionPane.showMessageDialog(null, "Logi Successfull" + res.getInt("id"));
-                    Home h = new Home();
-                    h.setVisible(true);
+                    Home hom = new Home();
+                    hom.setVisible(true);
                     this.setVisible(false);
                 }
                 else{

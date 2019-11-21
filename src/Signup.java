@@ -123,7 +123,7 @@ public class Signup extends javax.swing.JFrame {
         else if(jTextField3.getText().length() == 0){
             JOptionPane.showMessageDialog(null, "Enter Confirm Password");
         }
-        else if(jTextField1.getText() == jTextField1.getText()){
+        else if(!jTextField2.getText().equals(jTextField3.getText())){
             JOptionPane.showMessageDialog(null, "Password not matched");
         }
 //        if(jTextField1.getText().length() > 3 && jTextField2.getText().length() > 5 && jTextField3.getText().length() > 5){
@@ -153,8 +153,8 @@ public class Signup extends javax.swing.JFrame {
                     pst1.executeUpdate(); 
                     JOptionPane.showMessageDialog(null, "User Created Successfully!");
                     conn.close();
-                    Home h = new Home();
-                    h.setVisible(true);
+                    Login log = new Login();
+                    log.setVisible(true);
                     this.setVisible(false);
                 }
             }   
