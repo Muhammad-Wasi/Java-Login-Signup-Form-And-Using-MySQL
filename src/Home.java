@@ -92,7 +92,7 @@ public class Home extends javax.swing.JFrame {
 
             },
             new String [] {
-                "Name", "Age", "Department", "Semester", "Action"
+                "Name", "Age", "Department", "Semester"
             }
         ));
         jScrollPane1.setViewportView(jTable1);
@@ -176,12 +176,13 @@ public class Home extends javax.swing.JFrame {
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         // TODO add your handling code here:
-        JButton  editBtn = new JButton();
-        JButton  deleteBtn = new JButton();
-        editBtn.setText("Edit");
-        deleteBtn.setText("Delete");
-        editBtn.setOpaque(true);
-        deleteBtn.setOpaque(true);
+//        JButton  editBtn = new JButton();
+//        JButton  deleteBtn = new JButton();
+//        editBtn.setText("Edit");
+//        deleteBtn.setText("Delete");
+//        editBtn.setOpaque(true);
+//        deleteBtn.setOpaque(true);
+        
        DefaultTableModel model = (DefaultTableModel)jTable1.getModel();
         if(jTextField1.getText().length() == 0){
             JOptionPane.showMessageDialog(null, "Enter Username");
@@ -213,7 +214,7 @@ public class Home extends javax.swing.JFrame {
                     jTextField2.getText(),
                     jTextField3.getText(),
                     jTextField4.getText(),
-                    (editBtn+""+deleteBtn)
+//                    (editBtn+""+deleteBtn)
                 });
 //                row[0] = jTextField1.getText();
 //                row[1] = jTextField2.getText();
