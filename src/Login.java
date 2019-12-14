@@ -137,26 +137,26 @@ public class Login extends javax.swing.JFrame {
         else if(jTextField2.getText().length() == 0){
             JOptionPane.showMessageDialog(null, "Enter Password");
         }
-//        if(jTextField1.getText().length() > 3 && jTextField2.getText().length() > 5 && jTextField3.getText().length() > 5){
         else{    
             try{
                 Class.forName("com.mysql.jdbc.Driver");
                 
 //                Connection String
-                Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/authentication", "root", "");
+                Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/quizdb", "root", "");
                
 //                Select Query For Signup User 
-                String sql = " select * from users where username=?";
+                String sql = " select * from users where username=? and password=?";
                 PreparedStatement pst = conn.prepareStatement(sql);
                 pst.setString(1, jTextField1.getText());
+                pst.setString(2, jTextField2.getText());
                 
                 ResultSet res = pst.executeQuery();
                 if(res.next()){
-                    JOptionPane.showMessageDialog(null, "Logi Successfull");
-                    String id = String.valueOf(res.getInt("id"));
-                    Home hom = new Home(id);
-                    hom.setVisible(true);
+                    JOptionPane.showMessageDialog(null, "Login Successfull");
+//                    String id = String.valueOf(res.getInt("id"));
+                    Teachers teacherList = new Teachers();
                     this.setVisible(false);
+                    teacherList.setVisible(true);
                 }
                 else{
                     JOptionPane.showMessageDialog(null, "Login Failed!");
@@ -171,8 +171,8 @@ public class Login extends javax.swing.JFrame {
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         // TODO add your handling code here:
         Signup signup = new Signup();
-        signup.setVisible(true);
         this.setVisible(false);
+        signup.setVisible(true);
     }//GEN-LAST:event_jButton2ActionPerformed
 
     /**

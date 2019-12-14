@@ -1,3 +1,11 @@
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.Statement;
+import javax.swing.JOptionPane;
+
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
@@ -54,9 +62,14 @@ public class StdPSignin extends javax.swing.JFrame {
         jLabel4.setText("Semester:");
 
         jLabel5.setFont(new java.awt.Font("Times New Roman", 0, 14)); // NOI18N
-        jLabel5.setText("Enrolment No:");
+        jLabel5.setText("Enrollment No:");
 
         jButton1.setText("Sign In");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
 
         jTextField2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -150,6 +163,74 @@ public class StdPSignin extends javax.swing.JFrame {
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_jButton2ActionPerformed
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        // TODO add your handling code here:
+        if(jTextField1.getText().equals("")){
+            JOptionPane.showMessageDialog(null, "Enter Firstname");
+        }
+        else if(jTextField2.getText().equals("")){
+            JOptionPane.showMessageDialog(null, "Enter Lastname");
+        }
+        else if(jTextField3.getText().equals("")){
+            JOptionPane.showMessageDialog(null, "Enter Semester");
+        }
+        else if(jTextField4.getText().equals("")){
+            JOptionPane.showMessageDialog(null, "Enter Enrolment");
+        }
+        else{    
+            try{
+                Class.forName("com.mysql.jdbc.Driver");
+                
+//                Connection String
+                Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/quizdb", "root", "");
+               
+//                Select Query For Signup User 
+//                String sql = " select * from students where firstname=? and lastname=? and semester=? and enrolment=? ";
+                String sql = " select * from students where enrollment=? ";
+                PreparedStatement pst = conn.prepareStatement(sql);
+                pst.setString(1, jTextField4.getText());
+//                String sql1 = " insert into students (firstname, lastname, semester, enrolment)" + " values (?, ?, ?, ?)";
+//                PreparedStatement pst1 = conn.prepareStatement(sql1);
+//                pst.setString(1, jTextField1.getText());
+//                pst.setString(2, jTextField2.getText());
+//                pst.setString(3, jTextField3.getText());
+//                pst.setString(4, jTextField4.getText());
+                
+                ResultSet res = pst.executeQuery();
+                if(res.next()){
+                    JOptionPane.showMessageDialog(null, "Login Successfull");
+                    int id = res.getInt("id");
+                    StdPTeachers teacherList = new StdPTeachers(id);
+                    this.setVisible(false);
+                    teacherList.setVisible(true);
+                }
+                else{
+                    String sql1 = " insert into students (firstname, lastname, semester, enrollment)" + " values (?, ?, ?, ?)";
+                    PreparedStatement pst1 = conn.prepareStatement(sql1,Statement.RETURN_GENERATED_KEYS);
+                    pst1.setString(1, jTextField1.getText());
+                    pst1.setString(2, jTextField2.getText());
+                    pst1.setString(3, jTextField3.getText());
+                    pst1.setString(4, jTextField4.getText());
+//                    pst1.executeUpdate();
+                    pst1.execute();
+                    ResultSet rs = pst1.getGeneratedKeys();
+                    int generatedKey = 0;
+                    if (rs.next()) {
+                        generatedKey = rs.getInt(1);
+                        System.out.println("adasdas" + generatedKey);
+                    }
+                    JOptionPane.showMessageDialog(null, "Login Successfull!");
+                    StdPTeachers teacherList = new StdPTeachers(generatedKey);
+                    this.setVisible(false);
+                    teacherList.setVisible(true);
+                }
+            }   
+            catch(Exception e){
+                JOptionPane.showMessageDialog(null, "Error is => " + e);
+            }
+        }
+    }//GEN-LAST:event_jButton1ActionPerformed
 
     /**
      * @param args the command line arguments

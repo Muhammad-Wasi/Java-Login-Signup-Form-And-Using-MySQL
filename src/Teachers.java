@@ -1,4 +1,9 @@
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.Statement;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -18,11 +23,29 @@ import javax.swing.table.DefaultTableModel;
  * @author Mohammad Wasi
  */
 public class Teachers extends javax.swing.JFrame {
+    DefaultTableModel model;
     /**
      * Creates new form Teachers
      */
     public Teachers() {
         initComponents();
+        model = (DefaultTableModel)jTable1.getModel();
+        try{
+                Class.forName("com.mysql.jdbc.Driver");
+                Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/quizdb", "root", "");
+                
+                String sqlReq = "select * from teachers";
+                PreparedStatement pstReq = conn.prepareStatement(sqlReq);
+                ResultSet res = pstReq.executeQuery();
+                while (res.next()) {
+                    int id = res.getInt("id");
+                    String name = res.getString("name");
+                    model.addRow(new Object[] {id, name});
+                }
+            }
+            catch(Exception error){
+                    JOptionPane.showMessageDialog(null, "Error is => " + error);
+            }
     }
 
     /**
@@ -39,6 +62,7 @@ public class Teachers extends javax.swing.JFrame {
         jScrollPane1 = new javax.swing.JScrollPane();
         jTable1 = new javax.swing.JTable();
         jButton2 = new javax.swing.JButton();
+        jButton3 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -57,7 +81,7 @@ public class Teachers extends javax.swing.JFrame {
 
             },
             new String [] {
-                "ID", "Instructor", "Action", "View"
+                "ID", "Instructor"
             }
         ));
         jScrollPane1.setViewportView(jTable1);
@@ -66,6 +90,13 @@ public class Teachers extends javax.swing.JFrame {
         jButton2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton2ActionPerformed(evt);
+            }
+        });
+
+        jButton3.setText("View");
+        jButton3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton3ActionPerformed(evt);
             }
         });
 
@@ -84,6 +115,10 @@ public class Teachers extends javax.swing.JFrame {
                         .addGap(130, 130, 130)
                         .addComponent(jButton1)))
                 .addContainerGap(30, Short.MAX_VALUE))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jButton3)
+                .addGap(275, 275, 275))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -94,8 +129,10 @@ public class Teachers extends javax.swing.JFrame {
                     .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addGap(18, 18, 18)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 416, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(22, Short.MAX_VALUE))
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 380, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(jButton3)
+                .addContainerGap(17, Short.MAX_VALUE))
         );
 
         pack();
@@ -103,17 +140,58 @@ public class Teachers extends javax.swing.JFrame {
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         // TODO add your handling code here:
+        Login login = new Login();
+        this.setVisible(false);
+        login.setVisible(true);
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         // TODO add your handling code here:
-        DefaultTableModel model = (DefaultTableModel)jTable1.getModel();
+//        DefaultTableModel model = (DefaultTableModel)jTable1.getModel();
         String name;
         name = JOptionPane.showInputDialog(null, "Enter Your Name!", "Instructor D", JOptionPane.INFORMATION_MESSAGE);
         if(!name.isEmpty()){
-            model.addRow(new Object[] {model.getRowCount()+1, name, "Edit", "View"});
+            try{
+                Class.forName("com.mysql.jdbc.Driver");
+                Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/quizdb", "root", "");
+                String sql = " insert into teachers (name)" + " values (?)";
+                PreparedStatement pst = conn.prepareStatement(sql,Statement.RETURN_GENERATED_KEYS);
+                pst.setString(1, name);
+                
+                
+                String sql1 = " select * from teachers where name=?";
+                PreparedStatement pst1 = conn.prepareStatement(sql1);
+                pst1.setString(1, name);
+                
+                ResultSet res = pst1.executeQuery();
+                if(res.next()){
+                    JOptionPane.showMessageDialog(null, "Teacher Name Already Exist");
+                }
+                else{
+                    pst.execute();
+                    ResultSet rs = pst.getGeneratedKeys();
+                    int generatedKey = 0;
+                    if (rs.next()) {
+                        generatedKey = rs.getInt(1);
+                        System.out.println("adasdas" + generatedKey);
+                    }
+                    model.addRow(new Object[] {generatedKey, name});
+                }
+            }
+            catch(Exception error){
+                    JOptionPane.showMessageDialog(null, "Error is => " + error);
+            }
         }
     }//GEN-LAST:event_jButton2ActionPerformed
+
+    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+        // TODO add your handling code here:
+        int id = jTable1.getSelectedRow();
+        String data = model.getValueAt(id, 0).toString();
+        Quizname quiz = new Quizname(Integer.parseInt(data));
+        this.setVisible(false);
+        quiz.setVisible(true);
+    }//GEN-LAST:event_jButton3ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -141,7 +219,6 @@ public class Teachers extends javax.swing.JFrame {
             java.util.logging.Logger.getLogger(Teachers.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
-
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
@@ -153,6 +230,7 @@ public class Teachers extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
+    private javax.swing.JButton jButton3;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTable jTable1;

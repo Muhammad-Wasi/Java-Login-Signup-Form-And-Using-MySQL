@@ -1,3 +1,8 @@
+
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import javax.swing.Timer;
+
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
@@ -9,12 +14,16 @@
  * @author Mohammad Wasi
  */
 public class StdPQuestions extends javax.swing.JFrame {
-
+    int quizID, teacherID, UID;
     /**
      * Creates new form StdPQuestions
      */
-    public StdPQuestions() {
+    public StdPQuestions(int quizid, int teacherid, int uid) {
         initComponents();
+        quizID = quizid;
+        teacherID = teacherid;
+        UID = uid;
+//        Object[] myArray = new Object[100];
     }
 
     /**
@@ -186,7 +195,7 @@ public class StdPQuestions extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new StdPQuestions().setVisible(true);
+                new StdPQuestions(0, 0, 0).setVisible(true);
             }
         });
     }

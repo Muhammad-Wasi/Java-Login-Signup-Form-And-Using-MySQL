@@ -153,7 +153,7 @@ public class Signup extends javax.swing.JFrame {
                 Class.forName("com.mysql.jdbc.Driver");
                 
 //                Connection String
-                Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/authentication", "root", "");
+                Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/quizdb", "root", "");
                 
 //                Insert Query For Signup User
                 String sql1 = " insert into users (username, password)" + " values (?, ?)";
@@ -175,8 +175,8 @@ public class Signup extends javax.swing.JFrame {
                     JOptionPane.showMessageDialog(null, "User Created Successfully!");
                     conn.close();
                     Login log = new Login();
-                    log.setVisible(true);
                     this.setVisible(false);
+                    log.setVisible(true);
                 }
             }   
             catch(Exception e){
@@ -188,8 +188,8 @@ public class Signup extends javax.swing.JFrame {
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         // TODO add your handling code here:
                     Login log = new Login();
-                    log.setVisible(true);
                     this.setVisible(false);
+                    log.setVisible(true);
     }//GEN-LAST:event_jButton2ActionPerformed
 
     /**

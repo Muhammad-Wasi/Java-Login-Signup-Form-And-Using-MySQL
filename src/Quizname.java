@@ -1,4 +1,9 @@
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.Statement;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
@@ -13,12 +18,35 @@ import javax.swing.table.DefaultTableModel;
  * @author Mohammad Wasi
  */
 public class Quizname extends javax.swing.JFrame {
-
-    /**
-     * Creates new form Quizname
-     */
-    public Quizname() {
+    DefaultTableModel model;
+    int selectedID;
+   
+    public Quizname(int sID) {
         initComponents();
+        selectedID = sID;
+        System.out.println("ID" + selectedID);
+        model = (DefaultTableModel)jTable1.getModel();
+        try{
+                Class.forName("com.mysql.jdbc.Driver");
+                Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/quizdb", "root", "");
+                
+                String sqlReq = "select * from quiz where uid=?";
+                PreparedStatement pstReq = conn.prepareStatement(sqlReq);
+                pstReq.setInt(1, selectedID);
+                ResultSet res = pstReq.executeQuery();
+                System.out.println("id====> "+ sID);
+                while (res.next()) {
+                    int id = res.getInt("id");
+                    String name = res.getString("name");
+                    String secret_key = res.getString("secret_key");
+                    int time_duration = res.getInt("time_duration");
+                    String questions = res.getString("questions");
+                    model.addRow(new Object[] {id, name, questions, time_duration, secret_key});
+                }
+            }
+            catch(Exception error){
+                    JOptionPane.showMessageDialog(null, "Error is => 11" + error);
+            }
     }
 
     /**
@@ -35,11 +63,15 @@ public class Quizname extends javax.swing.JFrame {
         jButton2 = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         jTable1 = new javax.swing.JTable();
+        jButton3 = new javax.swing.JButton();
+        jButton4 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
         jLabel1.setFont(new java.awt.Font("Times New Roman", 1, 24)); // NOI18N
+        jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel1.setText("Quiz Names");
+        jLabel1.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
 
         jButton1.setText("Add");
         jButton1.addActionListener(new java.awt.event.ActionListener() {
@@ -60,13 +92,27 @@ public class Quizname extends javax.swing.JFrame {
 
             },
             new String [] {
-                "ID", "Quiz", "Total Questions", "Time Duration", "Secret Key", "Action", "View"
+                "ID", "Quiz", "Total Questions", "Time Duration", "Secret Key"
             }
         ));
         jScrollPane1.setViewportView(jTable1);
         if (jTable1.getColumnModel().getColumnCount() > 0) {
             jTable1.getColumnModel().getColumn(0).setResizable(false);
         }
+
+        jButton3.setText("View");
+        jButton3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton3ActionPerformed(evt);
+            }
+        });
+
+        jButton4.setText("Back");
+        jButton4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton4ActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -75,14 +121,20 @@ public class Quizname extends javax.swing.JFrame {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addGap(20, 20, 20)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 580, Short.MAX_VALUE)
+                    .addComponent(jScrollPane1)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jButton1)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jLabel1)
-                        .addGap(148, 148, 148)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(jButton2)))
                 .addGap(24, 24, 24))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap(256, Short.MAX_VALUE)
+                .addComponent(jButton4)
+                .addGap(18, 18, 18)
+                .addComponent(jButton3)
+                .addGap(230, 230, 230))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -92,9 +144,13 @@ public class Quizname extends javax.swing.JFrame {
                     .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, 37, Short.MAX_VALUE)
                     .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 29, Short.MAX_VALUE)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 416, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
+                .addGap(28, 28, 28)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 390, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jButton3)
+                    .addComponent(jButton4))
+                .addContainerGap(12, Short.MAX_VALUE))
         );
 
         pack();
@@ -102,19 +158,74 @@ public class Quizname extends javax.swing.JFrame {
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         // TODO add your handling code here:
+        Login login = new Login();
+        this.setVisible(false);
+        login.setVisible(true);
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         // TODO add your handling code here:
         DefaultTableModel model = (DefaultTableModel)jTable1.getModel();
-        String name,duration,secretKey;
+        String name,duration,secretKey,question;
         name = JOptionPane.showInputDialog(null, "Enter Quiz Name", "Quiz Detail", JOptionPane.INFORMATION_MESSAGE);
         duration = JOptionPane.showInputDialog(null, "Enter Time Duration", "Quiz Detail", JOptionPane.INFORMATION_MESSAGE);
         secretKey = JOptionPane.showInputDialog(null, "Enter Secret Key", "Quiz Detail", JOptionPane.INFORMATION_MESSAGE);
-        if(!name.isEmpty() && !duration.isEmpty() && !secretKey.isEmpty()){
-            model.addRow(new Object[] {model.getRowCount()+1, name, 10, duration, secretKey, "Edit", "View"});
+        question = JOptionPane.showInputDialog(null, "Enter Number Of Question", "Quiz Detail", JOptionPane.INFORMATION_MESSAGE);
+        if(!name.isEmpty() && !duration.isEmpty() && !secretKey.isEmpty() && !question.isEmpty()){
+            try{
+                Class.forName("com.mysql.jdbc.Driver");
+                Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/quizdb", "root", "");
+                String sql = " insert into quiz (uid, name, secret_key, time_duration,questions)" + " values (?, ?, ?, ?, ?)";
+                PreparedStatement pst = conn.prepareStatement(sql,Statement.RETURN_GENERATED_KEYS);
+                pst.setInt(1, selectedID);
+                pst.setString(2, name);
+                pst.setString(3, secretKey);
+                pst.setString(4, duration);
+                pst.setString(5, question);
+//                pst.setString(selectedID, sql);
+                
+                String sql1 = " select * from quiz where name=?";
+                PreparedStatement pst1 = conn.prepareStatement(sql1);
+                pst1.setString(1, name);
+                
+                ResultSet res = pst1.executeQuery();
+                if(res.next()){
+                    JOptionPane.showMessageDialog(null, "Quiz Name Already Exist");
+                }
+                else{
+                    pst.execute();
+                    ResultSet rs = pst.getGeneratedKeys();
+                    int generatedKey = 0;
+                    if (rs.next()) {
+                        generatedKey = rs.getInt(1);
+                        System.out.println("adasdas" + generatedKey);
+                    }
+                    model.addRow(new Object[] {generatedKey, name, question, duration, secretKey});
+                }
+            }
+            catch(Exception error){
+                    JOptionPane.showMessageDialog(null, "Error is => 2222" + error);
+            }
+//            model.addRow(new Object[] {model.getRowCount()+1, name, 10, duration, secretKey});
         }
     }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
+        // TODO add your handling code here:
+        Teachers teacher = new Teachers();
+        this.setVisible(false);
+        teacher.setVisible(true);
+    }//GEN-LAST:event_jButton4ActionPerformed
+
+    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+        // TODO add your handling code here:
+        int id = jTable1.getSelectedRow();
+        String data = model.getValueAt(id, 0).toString();
+        String quesLength = model.getValueAt(id, 2).toString();
+        Questions questions = new Questions(Integer.parseInt(data), selectedID, Integer.parseInt(quesLength));
+        this.setVisible(false);
+        questions.setVisible(true);
+    }//GEN-LAST:event_jButton3ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -146,7 +257,7 @@ public class Quizname extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new Quizname().setVisible(true);
+                new Quizname(0).setVisible(true);
             }
         });
     }
@@ -154,6 +265,8 @@ public class Quizname extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
+    private javax.swing.JButton jButton3;
+    private javax.swing.JButton jButton4;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTable jTable1;
