@@ -1,6 +1,15 @@
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.Connection;
+//import java.sql.Date;
+import java.util.Date;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.Statement;
+import java.text.SimpleDateFormat;
+import javax.swing.JOptionPane;
 import javax.swing.Timer;
 
 /*
@@ -14,7 +23,18 @@ import javax.swing.Timer;
  * @author Mohammad Wasi
  */
 public class StdPQuestions extends javax.swing.JFrame {
-    int quizID, teacherID, UID;
+    int quizID, teacherID, UID, correctAns = 0, count = 0, i = 0;
+    QuestionsArr[] questionsArr;
+    long milliseconds;
+    class QuestionsArr{
+            String ques;
+            String opt1;
+            String opt2;
+            String opt3;
+            String opt4;
+            String ans;
+        }
+    
     /**
      * Creates new form StdPQuestions
      */
@@ -23,7 +43,47 @@ public class StdPQuestions extends javax.swing.JFrame {
         quizID = quizid;
         teacherID = teacherid;
         UID = uid;
-//        Object[] myArray = new Object[100];
+        questionsArr = new QuestionsArr[10];
+        try{
+            Class.forName("com.mysql.jdbc.Driver");
+            Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/quizdb", "root", "");
+            String sqlReq = "select * from question where quiz_id=?";
+            PreparedStatement pstReq = conn.prepareStatement(sqlReq);
+            pstReq.setInt(1, quizID);
+            ResultSet res = pstReq.executeQuery();
+            while (res.next()) {
+                questionsArr[i] = new QuestionsArr();
+                questionsArr[i].ques = res.getString("ques");
+                questionsArr[i].opt1 = res.getString("opt1");
+                questionsArr[i].opt2 = res.getString("opt2");
+                questionsArr[i].opt3 = res.getString("opt3");
+                questionsArr[i].opt4 = res.getString("opt4");
+                questionsArr[i].ans = res.getString("ans");
+                i = i + 1;
+            }
+        }
+        catch(Exception error){
+            JOptionPane.showMessageDialog(null, "Error is => 11" + error);
+        }
+        
+        jButton1.setText("Next");
+        jLabel3.setText("Q:"+(count+1));
+        jLabel8.setText("" + questionsArr[count].ques);
+        jRadioButton1.setText("" + questionsArr[count].opt1);
+        jRadioButton2.setText("" + questionsArr[count].opt2);
+        jRadioButton3.setText("" + questionsArr[count].opt3);
+        jRadioButton4.setText("" + questionsArr[count].opt4);
+        
+//        milliseconds = 10000;
+//        Timer t = new Timer(1000, new ActionListener() {
+//            milliseconds = milliseconds - 1000;
+//          public void actionPerformed(ActionEvent e) {
+////              milliseconds = 1000;
+//              SimpleDateFormat df = new SimpleDateFormat("mm:ss");
+//              System.out.println("Date" + df.format(milliseconds));
+//          }
+//       });
+//        t.start();
     }
 
     /**
@@ -41,6 +101,7 @@ public class StdPQuestions extends javax.swing.JFrame {
         buttonGroup4 = new javax.swing.ButtonGroup();
         buttonGroup5 = new javax.swing.ButtonGroup();
         buttonGroup6 = new javax.swing.ButtonGroup();
+        buttonGroup7 = new javax.swing.ButtonGroup();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
@@ -53,10 +114,12 @@ public class StdPQuestions extends javax.swing.JFrame {
         jLabel6 = new javax.swing.JLabel();
         jLabel7 = new javax.swing.JLabel();
         jLabel8 = new javax.swing.JLabel();
+        jButton1 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
         jLabel1.setFont(new java.awt.Font("Times New Roman", 1, 24)); // NOI18N
+        jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel1.setText("Questions");
 
         jLabel2.setFont(new java.awt.Font("Times New Roman", 1, 14)); // NOI18N
@@ -65,12 +128,20 @@ public class StdPQuestions extends javax.swing.JFrame {
         jLabel3.setFont(new java.awt.Font("Times New Roman", 1, 12)); // NOI18N
         jLabel3.setText("Q:01");
 
+        buttonGroup1.add(jRadioButton1);
         jRadioButton1.setFont(new java.awt.Font("Times New Roman", 0, 14)); // NOI18N
         jRadioButton1.setText("Option 1");
+        jRadioButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jRadioButton1ActionPerformed(evt);
+            }
+        });
 
+        buttonGroup1.add(jRadioButton2);
         jRadioButton2.setFont(new java.awt.Font("Times New Roman", 0, 14)); // NOI18N
         jRadioButton2.setText("Option 2");
 
+        buttonGroup1.add(jRadioButton3);
         jRadioButton3.setFont(new java.awt.Font("Times New Roman", 0, 14)); // NOI18N
         jRadioButton3.setText("Option 3");
         jRadioButton3.addActionListener(new java.awt.event.ActionListener() {
@@ -79,6 +150,7 @@ public class StdPQuestions extends javax.swing.JFrame {
             }
         });
 
+        buttonGroup1.add(jRadioButton4);
         jRadioButton4.setFont(new java.awt.Font("Times New Roman", 0, 14)); // NOI18N
         jRadioButton4.setText("Option 4");
 
@@ -97,36 +169,48 @@ public class StdPQuestions extends javax.swing.JFrame {
         jLabel8.setFont(new java.awt.Font("Times New Roman", 0, 14)); // NOI18N
         jLabel8.setText("Question From Databse.");
 
+        jButton1.setText("Next");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jLabel1)
-                .addGap(143, 143, 143)
+                .addContainerGap(222, Short.MAX_VALUE)
+                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 307, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(128, 128, 128)
                 .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 87, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(23, 23, 23))
             .addGroup(layout.createSequentialGroup()
-                .addGap(40, 40, 40)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel4)
-                    .addComponent(jLabel5)
-                    .addComponent(jLabel6)
-                    .addComponent(jLabel7))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jRadioButton1)
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addGroup(layout.createSequentialGroup()
+                        .addGap(112, 112, 112)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(jLabel5)
+                            .addComponent(jLabel4)
+                            .addComponent(jLabel6)
+                            .addComponent(jLabel7))
+                        .addGap(18, 18, 18)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jRadioButton4)
-                            .addComponent(jRadioButton3)
                             .addComponent(jRadioButton2)
-                            .addComponent(jLabel8, javax.swing.GroupLayout.PREFERRED_SIZE, 484, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(0, 40, Short.MAX_VALUE))))
+                            .addComponent(jRadioButton1)
+                            .addComponent(jRadioButton3)
+                            .addComponent(jRadioButton4)))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(100, 100, 100)
+                        .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jLabel8, javax.swing.GroupLayout.PREFERRED_SIZE, 550, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addGap(0, 0, Short.MAX_VALUE))
+            .addGroup(layout.createSequentialGroup()
+                .addGap(346, 346, 346)
+                .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -135,9 +219,9 @@ public class StdPQuestions extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(67, 67, 67)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGap(66, 66, 66)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel8, javax.swing.GroupLayout.DEFAULT_SIZE, 25, Short.MAX_VALUE))
                 .addGap(29, 29, 29)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -155,7 +239,9 @@ public class StdPQuestions extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel7)
                     .addComponent(jRadioButton4))
-                .addContainerGap(192, Short.MAX_VALUE))
+                .addGap(60, 60, 60)
+                .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(107, 107, 107))
         );
 
         pack();
@@ -164,6 +250,82 @@ public class StdPQuestions extends javax.swing.JFrame {
     private void jRadioButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton3ActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_jRadioButton3ActionPerformed
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        // TODO add your handling code here:
+        if(jRadioButton1.isSelected() || jRadioButton2.isSelected() || jRadioButton3.isSelected() || jRadioButton4.isSelected()){
+            if (jRadioButton1.isSelected()) { 
+                if(questionsArr[count].opt1.equals(questionsArr[count].ans)){
+                    correctAns = correctAns + 1;
+                }
+            } 
+            else if (jRadioButton2.isSelected()) { 
+                if(questionsArr[count].opt2.equals(questionsArr[count].ans)){
+                    correctAns = correctAns + 1;
+                }
+            }
+            else if (jRadioButton3.isSelected()) { 
+                if(questionsArr[count].opt3.equals(questionsArr[count].ans)){
+                    correctAns = correctAns + 1;
+                } 
+            }
+            else if (jRadioButton4.isSelected()) { 
+                if(questionsArr[count].opt4.equals(questionsArr[count].ans)){
+                    correctAns = correctAns + 1;
+                }
+            }
+            buttonGroup1.clearSelection();
+            count = count + 1;
+            if(count < i - 1){
+                jButton1.setText("Next");
+                jLabel3.setText("Q:"+(count+1));
+                jLabel8.setText("" + questionsArr[count].ques);
+                jRadioButton1.setText("" + questionsArr[count].opt1);
+                jRadioButton2.setText("" + questionsArr[count].opt2);
+                jRadioButton3.setText("" + questionsArr[count].opt3);
+                jRadioButton4.setText("" + questionsArr[count].opt4);
+            }
+            else if(count == i - 1){
+                jButton1.setText("Submit");
+                jLabel3.setText("Q:"+(count+1));
+                jLabel8.setText("" + questionsArr[count].ques);
+                jRadioButton1.setText("" + questionsArr[count].opt1);
+                jRadioButton2.setText("" + questionsArr[count].opt2);
+                jRadioButton3.setText("" + questionsArr[count].opt3);
+                jRadioButton4.setText("" + questionsArr[count].opt4);    
+            }
+            else{
+                int score = (correctAns*100)/i;
+                Date date = new Date();
+                SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+                String format = formatter.format(date);
+                try{
+                    Class.forName("com.mysql.jdbc.Driver");
+                    Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/quizdb", "root", "");
+                    String sql1 = "insert into results (quiz_id, uid, score, date) values (?, ?, ?, ?)";
+                    PreparedStatement pst1 = conn.prepareStatement(sql1);
+                    pst1.setInt(1, quizID);
+                    pst1.setInt(2, UID);
+                    pst1.setInt(3, score);
+                    pst1.setString(4, format);
+                    pst1.execute();
+                    Quizresult result = new Quizresult(score, format, quizID, UID);
+                    this.setVisible(false);
+                    result.setVisible(true);
+                }
+                catch(Exception e){
+                    JOptionPane.showMessageDialog(null, "Error is => " + e);
+                }
+            }
+        }
+        else{
+            JOptionPane.showMessageDialog(null, "Please Select an options");
+        }
+    }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void jRadioButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton1ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jRadioButton1ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -207,6 +369,8 @@ public class StdPQuestions extends javax.swing.JFrame {
     private javax.swing.ButtonGroup buttonGroup4;
     private javax.swing.ButtonGroup buttonGroup5;
     private javax.swing.ButtonGroup buttonGroup6;
+    private javax.swing.ButtonGroup buttonGroup7;
+    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;

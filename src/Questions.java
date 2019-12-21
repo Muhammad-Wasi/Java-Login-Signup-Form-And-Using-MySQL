@@ -1,4 +1,9 @@
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.util.Arrays;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
@@ -14,15 +19,17 @@ import javax.swing.table.DefaultTableModel;
  */
 public class Questions extends javax.swing.JFrame {
     int quizID, teacherId, count, totalQuestions;
+    DefaultTableModel model;
     /**
      * Creates new form Questions
      */
-        class QuestionsArr{
+    QuestionsArr[] questionsArr;
+    class QuestionsArr{
             String ques;
-            String op11;
+            String opt1;
             String opt2;
             String opt3;
-            String optt4;
+            String opt4;
             String ans;
         }
         
@@ -31,10 +38,33 @@ public class Questions extends javax.swing.JFrame {
         quizID = sID;
         teacherId = teacherID;
         totalQuestions = totalQues;
-        
-        QuestionsArr[] questionsArr = new QuestionsArr[totalQues];
-        
-        System.out.println("Object ===> "+questionsArr[0]);
+        count = 0;
+        questionsArr = new QuestionsArr[totalQues];
+        model = (DefaultTableModel)jTable1.getModel();
+        try{
+            Class.forName("com.mysql.jdbc.Driver");
+            Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/quizdb", "root", "");
+            String sqlReq = "select * from question where quiz_id=?";
+            PreparedStatement pstReq = conn.prepareStatement(sqlReq);
+            pstReq.setInt(1, quizID);
+            ResultSet res = pstReq.executeQuery();
+            System.out.println("id====> "+ sID);
+            int id = 1;
+            String ques, ans, opt1, opt2, opt3, opt4;
+            while (res.next()) {
+                ques = res.getString("ques");
+                ans = res.getString("ans");
+                opt1 = res.getString("opt1");
+                opt2 = res.getString("opt2");
+                opt3 = res.getString("opt3");
+                opt4 = res.getString("opt4");
+                model.addRow(new Object[] {id, ques, ans, opt1, opt2, opt3, opt4});
+                id = id + 1;
+            }
+        }
+        catch(Exception error){
+            JOptionPane.showMessageDialog(null, "Error is => 11" + error);
+        }
     }
 
     /**
@@ -56,8 +86,10 @@ public class Questions extends javax.swing.JFrame {
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
         jLabel1.setFont(new java.awt.Font("Times New Roman", 1, 24)); // NOI18N
+        jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel1.setText("Questions");
 
+        jButton1.setFont(new java.awt.Font("Times New Roman", 1, 14)); // NOI18N
         jButton1.setText("Logout");
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -65,6 +97,7 @@ public class Questions extends javax.swing.JFrame {
             }
         });
 
+        jButton2.setFont(new java.awt.Font("Times New Roman", 1, 14)); // NOI18N
         jButton2.setText("Add");
         jButton2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -82,6 +115,7 @@ public class Questions extends javax.swing.JFrame {
         ));
         jScrollPane1.setViewportView(jTable1);
 
+        jButton3.setFont(new java.awt.Font("Times New Roman", 1, 14)); // NOI18N
         jButton3.setText("Back");
         jButton3.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -94,20 +128,20 @@ public class Questions extends javax.swing.JFrame {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addGap(20, 20, 20)
+                .addGap(30, 30, 30)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 575, Short.MAX_VALUE)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 703, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jButton2)
-                        .addGap(167, 167, 167)
-                        .addComponent(jLabel1)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGap(18, 18, 18)
+                        .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGap(18, 18, 18)
                         .addComponent(jButton1)))
-                .addGap(19, 19, 19))
+                .addGap(30, 30, 30))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jButton3)
-                .addGap(258, 258, 258))
+                .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 71, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(340, 340, 340))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -119,9 +153,9 @@ public class Questions extends javax.swing.JFrame {
                     .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addGap(27, 27, 27)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 401, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addComponent(jButton3)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 11, Short.MAX_VALUE)
+                .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
         );
 
         pack();
@@ -129,17 +163,76 @@ public class Questions extends javax.swing.JFrame {
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         // TODO add your handling code here:
-        DefaultTableModel model = (DefaultTableModel)jTable1.getModel();
-        String ques,ans,opt1,opt2,opt3,opt4;
-        ques = JOptionPane.showInputDialog(null, "Enter Question", "Question", JOptionPane.INFORMATION_MESSAGE);
-        ans = JOptionPane.showInputDialog(null, "Enter Answer", "Question", JOptionPane.INFORMATION_MESSAGE);
-        opt1 = JOptionPane.showInputDialog(null, "Enter Option 1", "Question", JOptionPane.INFORMATION_MESSAGE);
-        opt2 = JOptionPane.showInputDialog(null, "Enter Option 2", "Question", JOptionPane.INFORMATION_MESSAGE);
-        opt3 = JOptionPane.showInputDialog(null, "Enter Option 3", "Question", JOptionPane.INFORMATION_MESSAGE);
-        opt4 = JOptionPane.showInputDialog(null, "Enter Option 4", "Question", JOptionPane.INFORMATION_MESSAGE);
-        if(!ques.isEmpty() && !ans.isEmpty() && !opt1.isEmpty() && !opt2.isEmpty() && !opt3.isEmpty() && !opt4.isEmpty()){
-            model.addRow(new Object[] { model.getRowCount()+1, ques, ans, opt1, opt2, opt3, opt4});
+        System.out.println("Data==="+ count + "...." + totalQuestions);
+        if(count < totalQuestions){
+//            DefaultTableModel model = (DefaultTableModel)jTable1.getModel();
+            model = (DefaultTableModel)jTable1.getModel();
+            String ques,ans,opt1,opt2,opt3,opt4;
+            ques = JOptionPane.showInputDialog(null, "Enter Question", "Question", JOptionPane.INFORMATION_MESSAGE);
+            ans = JOptionPane.showInputDialog(null, "Enter Answer", "Question", JOptionPane.INFORMATION_MESSAGE);
+            opt1 = JOptionPane.showInputDialog(null, "Enter Option 1", "Question", JOptionPane.INFORMATION_MESSAGE);
+            opt2 = JOptionPane.showInputDialog(null, "Enter Option 2", "Question", JOptionPane.INFORMATION_MESSAGE);
+            opt3 = JOptionPane.showInputDialog(null, "Enter Option 3", "Question", JOptionPane.INFORMATION_MESSAGE);
+            opt4 = JOptionPane.showInputDialog(null, "Enter Option 4", "Question", JOptionPane.INFORMATION_MESSAGE);
+            if(!ques.isEmpty() && !ans.isEmpty() && !opt1.isEmpty() && !opt2.isEmpty() && !opt3.isEmpty() && !opt4.isEmpty()){
+                model.addRow(new Object[] { model.getRowCount()+1, ques, ans, opt1, opt2, opt3, opt4});
+                questionsArr[count] = new QuestionsArr();
+                questionsArr[count].ques = ques;
+                questionsArr[count].opt1 = opt1;
+                questionsArr[count].opt2 = opt2;
+                questionsArr[count].opt3 = opt3;
+                questionsArr[count].opt4 = opt4;
+                questionsArr[count].ans = ans;
+            }
+            if(count + 1 == totalQuestions){
+                jButton2.setText("Submit");
+                try{
+                Class.forName("com.mysql.jdbc.Driver");
+                Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/quizdb", "root", "");
+                for(int i = 0; i < totalQuestions; i++){
+                    String sqlReq = "insert into question (ques, ans, opt1, opt2, opt3, opt4, quiz_id) values(?, ?, ?, ?, ?, ?, ?)";
+                    PreparedStatement pstReq = conn.prepareStatement(sqlReq);
+                    pstReq.setString(1, questionsArr[i].ques);
+                    pstReq.setString(2, questionsArr[i].ans);
+                    pstReq.setString(3, questionsArr[i].opt1);
+                    pstReq.setString(4, questionsArr[i].opt2);
+                    pstReq.setString(5, questionsArr[i].opt3);
+                    pstReq.setString(6, questionsArr[i].opt4);
+                    pstReq.setInt(7, quizID);
+                    pstReq.execute();
+                    if(i+1 == totalQuestions){
+                        JOptionPane.showMessageDialog(null, "Successfully Added");
+                        Quizname quiz = new Quizname(teacherId); 
+                        this.setVisible(false);
+                        quiz.setVisible(true);
+                    }
+                }
+            }
+            catch(Exception error){
+                    JOptionPane.showMessageDialog(null, "Error is => 11" + error);
+            }
+            }
+            count = count + 1;
         }
+//        else{
+//            try{
+//                Class.forName("com.mysql.jdbc.Driver");
+//                Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/quizdb", "root", "");
+//                
+//                String sqlReq = "update quiz set questions=? where id=?";
+//                PreparedStatement pstReq = conn.prepareStatement(sqlReq);
+//                pstReq.setString(1, Arrays.toString(questionsArr));
+//                pstReq.setInt(2, quizID);
+//                pstReq.executeUpdate();
+//                JOptionPane.showMessageDialog(null, "Successfully Added");
+//                Quizname quiz = new Quizname(teacherId); 
+//                this.setVisible(false);
+//                quiz.setVisible(true);
+//            }
+//            catch(Exception error){
+//                    JOptionPane.showMessageDialog(null, "Error is => 11" + error);
+//            }
+//        }
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
